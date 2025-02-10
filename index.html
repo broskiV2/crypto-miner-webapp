@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="fr">
+<html>
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CryptoMiner</title>
+    <title>Test WebApp</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
         body {
@@ -13,124 +13,45 @@
             margin: 0;
             padding: 20px;
         }
-        
-        .balance-card {
-            background: linear-gradient(145deg, #FFD700, #FFA500);
-            border-radius: 15px;
-            padding: 20px;
-            margin-bottom: 20px;
-            text-align: center;
-        }
-        
-        .balance-title {
-            font-size: 14px;
-            opacity: 0.8;
-        }
-        
-        .balance-amount {
-            font-size: 32px;
-            font-weight: bold;
-            margin: 10px 0;
-        }
-        
-        .balance-usd {
-            font-size: 16px;
-            opacity: 0.8;
-        }
-        
-        .mining-rate {
-            background: rgba(255, 255, 255, 0.1);
-            border-radius: 10px;
-            padding: 10px;
-            text-align: center;
-            margin: 10px 0;
-        }
-        
-        .start-mining-btn {
-            background: linear-gradient(145deg, #FFD700, #FFA500);
+        .test-button {
+            background: #2ea6ff;
             border: none;
-            border-radius: 25px;
-            color: black;
-            font-size: 18px;
-            font-weight: bold;
-            padding: 15px;
-            width: 100%;
-            margin-top: 20px;
-            cursor: pointer;
-        }
-        
-        .nav-bar {
-            position: fixed;
-            bottom: 0;
-            left: 0;
-            right: 0;
-            background: #2a2a2a;
-            padding: 15px;
-            display: flex;
-            justify-content: space-around;
-        }
-        
-        .nav-item {
-            text-align: center;
             color: white;
-            text-decoration: none;
-            font-size: 12px;
+            padding: 15px 30px;
+            border-radius: 8px;
+            font-size: 16px;
+            margin: 10px 0;
+            cursor: pointer;
+            width: 100%;
         }
     </style>
 </head>
 <body>
-    <div class="balance-card">
-        <div class="balance-title">YOUR BALANCE:</div>
-        <div class="balance-amount">0.00000000</div>
-        <div class="balance-usd">~ 0.00 $</div>
+    <div id="main">
+        <h2>Test WebApp Telegram</h2>
+        <button class="test-button" onclick="showAlert()">Tester l'App</button>
     </div>
-    
-    <div class="mining-rate">
-        <span>⚡ 0.00000000 BTC/day</span>
-    </div>
-    
-    <button class="start-mining-btn" onclick="startMining()">Start mining</button>
-    
-    <nav class="nav-bar">
-        <a class="nav-item">🏠<br>Home</a>
-        <a class="nav-item">📊<br>Stats</a>
-        <a class="nav-item">⚡<br>Power</a>
-        <a class="nav-item">💰<br>Withdraw</a>
-        <a class="nav-item">⚙️<br>Settings</a>
-    </nav>
 
     <script>
+        // Initialisation de Telegram WebApp
         let tg = window.Telegram.WebApp;
+
+        // Expansion de la WebApp
         tg.expand();
-        
-        let mining = false;
-        let miningRate = 0.00000001;
-        let balance = 0;
-        
-        function startMining() {
-            mining = !mining;
-            let btn = document.querySelector('.start-mining-btn');
-            btn.textContent = mining ? 'Stop mining' : 'Start mining';
-            
-            if (mining) {
-                startMiningProcess();
-            }
+
+        // Activation du bouton principal
+        tg.MainButton.setText('BOUTON PRINCIPAL');
+        tg.MainButton.show();
+
+        // Fonction de test
+        function showAlert() {
+            tg.showAlert('La WebApp fonctionne !');
         }
-        
-        function startMiningProcess() {
-            if (!mining) return;
-            
-            balance += miningRate;
-            updateBalance();
-            setTimeout(startMiningProcess, 1000);
-        }
-        
-        function updateBalance() {
-            document.querySelector('.balance-amount').textContent = 
-                balance.toFixed(8);
-            document.querySelector('.balance-usd').textContent = 
-                `~ ${(balance * 40000).toFixed(2)} $`;
-        }
+
+        // Événement au clic du bouton principal
+        tg.MainButton.onClick(function() {
+            tg.showAlert('Bouton principal cliqué !');
+        });
     </script>
 </body>
 </html> 
