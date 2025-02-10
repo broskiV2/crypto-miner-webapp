@@ -3,54 +3,229 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Test WebApp</title>
+    <title>Solana Miner</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
+        :root {
+            --primary-color: #14F195;
+            --secondary-color: #9945FF;
+            --bg-color: #121212;
+            --card-bg: #1E1E1E;
+        }
+
         body {
-            background-color: #1a1a1a;
+            background-color: var(--bg-color);
             color: white;
-            font-family: Arial, sans-serif;
+            font-family: 'Arial', sans-serif;
             margin: 0;
             padding: 20px;
+            min-height: 100vh;
         }
-        .test-button {
-            background: #2ea6ff;
-            border: none;
-            color: white;
-            padding: 15px 30px;
-            border-radius: 8px;
-            font-size: 16px;
+
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .logo {
+            font-size: 24px;
+            font-weight: bold;
+            background: linear-gradient(45deg, var(--primary-color), var(--secondary-color));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 10px;
+        }
+
+        .card {
+            background: var(--card-bg);
+            border-radius: 20px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+        }
+
+        .balance-card {
+            background: linear-gradient(135deg, #1E1E1E, #2D2D2D);
+            text-align: center;
+        }
+
+        .balance-title {
+            font-size: 14px;
+            opacity: 0.8;
+            margin-bottom: 10px;
+        }
+
+        .balance-amount {
+            font-size: 32px;
+            font-weight: bold;
+            color: var(--primary-color);
             margin: 10px 0;
-            cursor: pointer;
+        }
+
+        .balance-usd {
+            font-size: 16px;
+            color: #888;
+        }
+
+        .mining-stats {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+            margin: 20px 0;
+        }
+
+        .stat-card {
+            background: var(--card-bg);
+            padding: 15px;
+            border-radius: 15px;
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 20px;
+            font-weight: bold;
+            color: var(--primary-color);
+        }
+
+        .stat-label {
+            font-size: 12px;
+            color: #888;
+            margin-top: 5px;
+        }
+
+        .mining-button {
+            background: linear-gradient(45deg, var(--primary-color), var(--secondary-color));
+            border: none;
+            color: black;
+            padding: 15px;
+            border-radius: 12px;
+            font-size: 18px;
+            font-weight: bold;
             width: 100%;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+
+        .mining-button:active {
+            transform: scale(0.98);
+        }
+
+        .nav-bar {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: var(--card-bg);
+            padding: 15px 20px;
+            display: flex;
+            justify-content: space-around;
+            border-top: 1px solid #333;
+        }
+
+        .nav-item {
+            text-align: center;
+            color: white;
+            text-decoration: none;
+            font-size: 12px;
+            opacity: 0.7;
+            transition: opacity 0.2s;
+        }
+
+        .nav-item.active {
+            opacity: 1;
+            color: var(--primary-color);
         }
     </style>
 </head>
 <body>
-    <div id="main">
-        <h2>Test WebApp Telegram</h2>
-        <button class="test-button" onclick="showAlert()">Tester l'App</button>
+    <div class="header">
+        <div class="logo">SOLANA MINER</div>
     </div>
 
-    <script>
-        // Initialisation de Telegram WebApp
-        let tg = window.Telegram.WebApp;
+    <div class="card balance-card">
+        <div class="balance-title">VOTRE SOLDE</div>
+        <div class="balance-amount">0.000 SOL</div>
+        <div class="balance-usd">≈ $0.00 USD</div>
+    </div>
 
-        // Expansion de la WebApp
+    <div class="mining-stats">
+        <div class="stat-card">
+            <div class="stat-value">0.000</div>
+            <div class="stat-label">SOL/HEURE</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-value">0</div>
+            <div class="stat-label">HASHRATE (H/s)</div>
+        </div>
+    </div>
+
+    <button class="mining-button" id="miningButton">DÉMARRER LE MINAGE</button>
+
+    <nav class="nav-bar">
+        <a class="nav-item active">🏠<br>Accueil</a>
+        <a class="nav-item">📊<br>Stats</a>
+        <a class="nav-item">⚡<br>Boost</a>
+        <a class="nav-item">💰<br>Retrait</a>
+    </nav>
+
+    <script>
+        let tg = window.Telegram.WebApp;
         tg.expand();
 
-        // Activation du bouton principal
-        tg.MainButton.setText('BOUTON PRINCIPAL');
-        tg.MainButton.show();
+        let mining = false;
+        let miningRate = 0.0001;
+        let balance = 0;
+        let hashrate = 0;
 
-        // Fonction de test
-        function showAlert() {
-            tg.showAlert('La WebApp fonctionne !');
+        const miningButton = document.getElementById('miningButton');
+        const balanceAmount = document.querySelector('.balance-amount');
+        const balanceUsd = document.querySelector('.balance-usd');
+        const hashrateElement = document.querySelector('.stat-value');
+
+        function startMining() {
+            mining = !mining;
+            miningButton.textContent = mining ? 'ARRÊTER LE MINAGE' : 'DÉMARRER LE MINAGE';
+            
+            if (mining) {
+                startMiningProcess();
+                updateHashrate();
+            } else {
+                hashrate = 0;
+                updateHashrate();
+            }
         }
 
-        // Événement au clic du bouton principal
-        tg.MainButton.onClick(function() {
-            tg.showAlert('Bouton principal cliqué !');
+        function startMiningProcess() {
+            if (!mining) return;
+            
+            balance += miningRate;
+            updateBalance();
+            setTimeout(startMiningProcess, 1000);
+        }
+
+        function updateBalance() {
+            balanceAmount.textContent = balance.toFixed(3) + ' SOL';
+            balanceUsd.textContent = `≈ $${(balance * 100).toFixed(2)} USD`;
+        }
+
+        function updateHashrate() {
+            if (mining) {
+                hashrate = Math.floor(Math.random() * 1000) + 500;
+            }
+            hashrateElement.textContent = hashrate;
+            if (mining) {
+                setTimeout(updateHashrate, 2000);
+            }
+        }
+
+        miningButton.addEventListener('click', startMining);
+
+        // Navigation
+        document.querySelectorAll('.nav-item').forEach(item => {
+            item.addEventListener('click', function() {
+                document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
+                this.classList.add('active');
+            });
         });
     </script>
 </body>
