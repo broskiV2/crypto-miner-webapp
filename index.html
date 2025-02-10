@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CryptoMiner</title>
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <style>
+        body {
+            background-color: #1a1a1a;
+            color: white;
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+        }
+        
+        .balance-card {
+            background: linear-gradient(145deg, #FFD700, #FFA500);
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        
+        .balance-title {
+            font-size: 14px;
+            opacity: 0.8;
+        }
+        
+        .balance-amount {
+            font-size: 32px;
+            font-weight: bold;
+            margin: 10px 0;
+        }
+        
+        .balance-usd {
+            font-size: 16px;
+            opacity: 0.8;
+        }
+        
+        .mining-rate {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            padding: 10px;
+            text-align: center;
+            margin: 10px 0;
+        }
+        
+        .start-mining-btn {
+            background: linear-gradient(145deg, #FFD700, #FFA500);
+            border: none;
+            border-radius: 25px;
+            color: black;
+            font-size: 18px;
+            font-weight: bold;
+            padding: 15px;
+            width: 100%;
+            margin-top: 20px;
+            cursor: pointer;
+        }
+        
+        .nav-bar {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: #2a2a2a;
+            padding: 15px;
+            display: flex;
+            justify-content: space-around;
+        }
+        
+        .nav-item {
+            text-align: center;
+            color: white;
+            text-decoration: none;
+            font-size: 12px;
+        }
+    </style>
+</head>
+<body>
+    <div class="balance-card">
+        <div class="balance-title">YOUR BALANCE:</div>
+        <div class="balance-amount">0.00000000</div>
+        <div class="balance-usd">~ 0.00 $</div>
+    </div>
+    
+    <div class="mining-rate">
+        <span>⚡ 0.00000000 BTC/day</span>
+    </div>
+    
+    <button class="start-mining-btn" onclick="startMining()">Start mining</button>
+    
+    <nav class="nav-bar">
+        <a class="nav-item">🏠<br>Home</a>
+        <a class="nav-item">📊<br>Stats</a>
+        <a class="nav-item">⚡<br>Power</a>
+        <a class="nav-item">💰<br>Withdraw</a>
+        <a class="nav-item">⚙️<br>Settings</a>
+    </nav>
+
+    <script>
+        let tg = window.Telegram.WebApp;
+        tg.expand();
+        
+        let mining = false;
+        let miningRate = 0.00000001;
+        let balance = 0;
+        
+        function startMining() {
+            mining = !mining;
+            let btn = document.querySelector('.start-mining-btn');
+            btn.textContent = mining ? 'Stop mining' : 'Start mining';
+            
+            if (mining) {
+                startMiningProcess();
+            }
+        }
+        
+        function startMiningProcess() {
+            if (!mining) return;
+            
+            balance += miningRate;
+            updateBalance();
+            setTimeout(startMiningProcess, 1000);
+        }
+        
+        function updateBalance() {
+            document.querySelector('.balance-amount').textContent = 
+                balance.toFixed(8);
+            document.querySelector('.balance-usd').textContent = 
+                `~ ${(balance * 40000).toFixed(2)} $`;
+        }
+    </script>
+</body>
+</html> 
